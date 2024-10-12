@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complex HTML Table</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+
+<h2>HTML Table with Colspan and Rowspan</h2>
+
+<table>
+    <caption>Complex Table Structure</caption>
+    <thead>
+        <tr>
+            <th rowspan="2">Item</th>
+            <th colspan="3">Details</th>
+            <th rowspan="2">Total</th>
+        </tr>
+        <tr>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Discount</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Item 1</td>
+            <td>$10</td>
+            <td>2</td>
+            <td rowspan="2">5%</td> <!-- Rowspan Example -->
+            <td rowspan="2">$19</td> <!-- Rowspan Example -->
+        </tr>
+        <tr>
+            <td>Item 2</td>
+            <td>$5</td>
+            <td>1</td>
+        </tr>
+        <tr>
+            <td>Item 3</td>
+            <td colspan="2">$15 for both</td> <!-- Colspan Example -->
+            <td>10%</td>
+            <td>$13.5</td>
+        </tr>
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="4">Grand Total</td>
+            <td>$32.5</td>
+        </tr>
+    </tfoot>
+</table>
+
+</body>
+</html>
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form to Table Insertion</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        input[type="text"], input[type="number"] {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        input[type="submit"] {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Insert Items into Table</h2>
+
+<form id="itemForm">
+    <label for="itemName">Item:</label>
+    <input type="text" id="itemName" name="itemName" required>
+
+    <label for="itemPrice">Price ($):</label>
+    <input type="number" id="itemPrice" name="itemPrice" step="0.01" required>
+
+    <label for="itemQuantity">Quantity:</label>
+    <input type="number" id="itemQuantity" name="itemQuantity" required>
+
+    <label for="itemDiscount">Discount (%):</label>
+    <input type="number" id="itemDiscount" name="itemDiscount" step="0.01" required>
+
+    <input type="submit" value="Add to Table">
+</form>
+
+<table id="itemTable">
+    <thead>
+        <tr>
+            <th>Item</th>
+            <th>Price ($)</th>
+            <th>Quantity</th>
+            <th>Discount (%)</th>
+            <th>Total</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Table rows will be inserted here dynamically -->
+    </tbody>
+</table>
+
+<button onclick="exportTableToExcel('itemTable', 'table-data')">Download as Excel</button>
+<button onclick="printTableAsPDF()">Download as PDF</button>
+
+<script>
+    // Function to calculate the total after discount
+    function calculateTotal(price, quantity, discount) {
+        let totalPrice = price * quantity;
+        let discountAmount = totalPrice * (discount / 100);
+        return (totalPrice - discountAmount).toFixed(2);
+    }
+
+    // Add event listener to the form
+    document.getElementById('itemForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent page refresh
+
+        // Get form values
+        let itemName = document.getElementById('itemName').value;
+        let itemPrice = parseFloat(document.getElementById('itemPrice').value);
+        let itemQuantity = parseInt(document.getElementById('itemQuantity').value);
+        let itemDiscount = parseFloat(document.getElementById('itemDiscount').value);
+
+        // Calculate total price after discount
+        let total = calculateTotal(itemPrice, itemQuantity, itemDiscount);
+
+        // Insert new row into the table
+        let table = document.getElementById('itemTable').getElementsByTagName('tbody')[0];
+        let newRow = table.insertRow();
+
+        // Insert cells and fill them with values
+        let cell1 = newRow.insertCell(0);
+        let cell2 = newRow.insertCell(1);
+        let cell3 = newRow.insertCell(2);
+        let cell4 = newRow.insertCell(3);
+        let cell5 = newRow.insertCell(4);
+
+        cell1.innerHTML = itemName;
+        cell2.innerHTML = `$${itemPrice.toFixed(2)}`;
+        cell3.innerHTML = itemQuantity;
+        cell4.innerHTML = `${itemDiscount}%`;
+        cell5.innerHTML = `$${total}`;
+
+        // Clear the form fields after submission
+        document.getElementById('itemForm').reset();
+    });
+
+
+function printTableAsPDF() {
+        // Trigger the browser's print functionality, which can save as PDF
+        window.print();
+    }
+
+    function exportTableToExcel(tableID, filename = '') {
+        let table = document.getElementById(tableID);
+        let tableHTML = table.outerHTML.replace(/ /g, '%20');
+
+        // Specify the file type
+        let dataType = 'application/vnd.ms-excel';
+        let downloadLink = document.createElement("a");
+
+        // Set file name
+        filename = filename ? filename + '.xls' : 'excel_data.xls';
+
+        // Create a download link
+        downloadLink.href = 'data:' + dataType + ', ' + tableHTML;
+
+        // Set the file name
+        downloadLink.download = filename;
+
+        // Trigger the download
+        downloadLink.click();
+    }
+</script>
+
+
+
+
+</body>
+</html>
